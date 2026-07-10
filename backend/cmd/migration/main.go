@@ -26,7 +26,7 @@ func main() {
 
 	log.Printf("Connected to database: %v", db.DB.Dialector.Name())
 
-	if err := db.DB.AutoMigrate(&models.User{}, &models.Room{}, &models.Lead{}, &models.Image{}); err != nil {
+	if err := db.DB.AutoMigrate(&models.User{}, &models.Room{}, &models.Lead{}, &models.Image{}, &models.SiteContent{}); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("All models migrated successfully")

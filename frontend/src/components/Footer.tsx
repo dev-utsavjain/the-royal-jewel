@@ -1,23 +1,32 @@
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSection } from '../lib/content';
 
 export default function Footer() {
+  const s = useSection('settings');
   return (
     <footer className="bg-black text-white py-16 px-6 md:px-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Section */}
           <div className="space-y-6">
-            <div className="font-serif text-3xl font-bold tracking-wider text-gold-500">
-              The Royal Jewel
+            <div className="flex items-center gap-3">
+              <img
+                src="https://res.cloudinary.com/dm3scoj2q/image/upload/v1783511410/ChatGPT_Image_Jul_8_2026_04_56_54_PM_fpbf68.png"
+                alt="The Royal Jewel"
+                className="h-12 w-12 object-contain shrink-0"
+              />
+              <div className="font-serif text-3xl font-bold tracking-wider text-gold-500">
+                The Royal Jewel
+              </div>
             </div>
             <p className="text-gray-400 font-light text-sm leading-relaxed">
-              Experience luxury and comfort at Hisar's premier rooftop hotel. Where exceptional hospitality meets modern elegance.
+              {s.brandBlurb as string}
             </p>
             <div className="flex space-x-2">
-              <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Facebook size={20} /></a>
-              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Instagram size={20} /></a>
-              <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Twitter size={20} /></a>
+              <a href={s.facebook as string} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Facebook size={20} /></a>
+              <a href={s.instagram as string} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Instagram size={20} /></a>
+              <a href={s.twitter as string} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="p-2.5 -m-0.5 inline-flex text-gray-400 hover:text-gold-500 transition-colors"><Twitter size={20} /></a>
             </div>
           </div>
 
@@ -53,16 +62,16 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-gold-500 shrink-0 mt-0.5" />
                 <span className="text-gray-400 text-sm font-light leading-relaxed">
-                  Sector 13, Near Shanti Devi Hospital, Hisar, Haryana 125005
+                  {s.address as string}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="text-gold-500 shrink-0" />
-                <a href="tel:+919930871000" className="text-gray-400 text-sm font-light hover:text-gold-500 transition-colors">+91 99308 71000</a>
+                <a href={`tel:${s.phoneTel}`} className="text-gray-400 text-sm font-light hover:text-gold-500 transition-colors">{s.phoneDisplay as string}</a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-gold-500 shrink-0" />
-                <a href="mailto:info@hoteltheroyaljewel.com" className="text-gray-400 text-sm font-light hover:text-gold-500 transition-colors break-all">info@hoteltheroyaljewel.com</a>
+                <a href={`mailto:${s.email}`} className="text-gray-400 text-sm font-light hover:text-gold-500 transition-colors break-all">{s.email as string}</a>
               </li>
             </ul>
           </div>

@@ -50,10 +50,20 @@ type Lead struct {
 	Status   string `json:"status"` // "new" | "contacted" | "closed"
 }
 
-// Image holds an admin-uploaded file. Bytes live in Postgres so they survive
-// Railway's ephemeral filesystem across redeploys. Served via GET /api/images/:id.
+// Image holds a legacy admin-uploaded file whose bytes live in Postgres. New
+// uploads go to MinIO instead (see internal/storage); this is kept so pre-existing
+// /api/images/:id URLs keep resolving.
 type Image struct {
 	gorm.Model
 	MimeType string `json:"mimeType"`
 	Data     []byte `gorm:"type:bytea" json:"-"`
+}
+
+// SiteContent stores editable site content as one JSON document per named section
+// (e.g. "hero", "story", "testimonials"). The frontend owns the schema and supplies
+// defaults, so an absent section simply falls back to the built-in defaults.
+type SiteContent struct {
+	gorm.Model
+	Section string `gorm:"uniqueIndex;not null" json:"section"`
+	Data    string `gorm:"type:jsonb" json:"-"`
 }

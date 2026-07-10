@@ -1,4 +1,5 @@
 bin
+.env
 .env.*
 !.env.example
 .env.development

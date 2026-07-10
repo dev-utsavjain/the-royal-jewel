@@ -16,10 +16,12 @@ func RegisterRoutes(r *gin.Engine) {
 		// Public CMS content
 		api.GET("/rooms", handler.ListRooms)
 		api.GET("/rooms/:slug", handler.GetRoom)
+		api.GET("/content", handler.GetContent)
 
 		// Public: lead capture (contact / booking) + image serving
 		api.POST("/leads", handler.CreateLead)
 		api.GET("/images/:id", handler.GetImage)
+		api.GET("/media/:key", handler.GetMedia)
 
 		// Admin auth
 		api.POST("/admin/login", handler.Login)
@@ -35,6 +37,8 @@ func RegisterRoutes(r *gin.Engine) {
 			admin.GET("/leads", handler.ListLeads)
 			admin.PATCH("/leads/:id", handler.UpdateLeadStatus)
 			admin.DELETE("/leads/:id", handler.DeleteLead)
+
+			admin.PUT("/content/:section", handler.UpdateContentSection)
 
 			admin.POST("/images", handler.UploadImage)
 		}

@@ -7,6 +7,7 @@ import (
 	webserver "imagine_backend/internal"
 	"imagine_backend/internal/db"
 	"imagine_backend/internal/middleware"
+	"imagine_backend/internal/storage"
 	"io/fs"
 	"log"
 	"net/http"
@@ -22,6 +23,9 @@ import (
 func StartServer() {
 	config.LoadConfig()
 	db.ConnectToDB()
+	if err := storage.Init(); err != nil {
+		log.Fatalf("MinIO init failed: %v", err)
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

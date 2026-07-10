@@ -1,14 +1,17 @@
 import { Phone, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { useSection } from '../lib/content';
 
 export default function Hero() {
+  const c = useSection('hero');
+  const settings = useSection('settings');
   return (
     <section id="home" className="relative min-h-screen w-full flex items-center justify-center text-center py-24 md:py-32">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url("https://res.cloudinary.com/dm3scoj2q/image/upload/v1782798871/dining-rooftop_nh4bsi.png")' }}
+        style={{ backgroundImage: `url("${c.backgroundImage}")` }}
       ></div>
       {/* Overlay for contrast */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80"></div>
@@ -28,15 +31,15 @@ export default function Hero() {
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={16} fill="currentColor" />
           ))}
-          <span className="text-white text-sm ml-2 tracking-wide font-medium">4.9 Stars (241+ Reviews)</span>
+          <span className="text-white text-sm ml-2 tracking-wide font-medium">{c.ratingText as string}</span>
         </motion.div>
 
         <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white font-bold leading-tight mb-4 drop-shadow-lg">
-          Experience Luxury and Comfort at Hotel The Royal Jewel
+          {c.heading as string}
         </h1>
-        
+
         <p className="text-gray-200 text-lg font-light tracking-wide mb-10 drop-shadow">
-          Hisar's Premier Rooftop Hotel with Exceptional Hospitality
+          {c.subtitle as string}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -46,7 +49,7 @@ export default function Hero() {
           <Link to="/rooms" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white px-8 py-3 uppercase tracking-wider text-sm font-medium transition-colors border border-white/20 text-center">
             View Rooms
           </Link>
-          <a href="tel:+919930871000" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white px-8 py-3 uppercase tracking-wider text-sm font-medium transition-colors border border-white/20 flex items-center justify-center gap-2">
+          <a href={`tel:${settings.phoneTel}`} className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white px-8 py-3 uppercase tracking-wider text-sm font-medium transition-colors border border-white/20 flex items-center justify-center gap-2">
             <Phone size={16} />
             Call Us
           </a>

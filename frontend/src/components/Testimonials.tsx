@@ -1,27 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useSection } from '../lib/content';
 
-const testimonials = [
-  {
-    text: "Excellent stay experience. Clean rooms and very cooperative staff.",
-    author: "Ramesh K."
-  },
-  {
-    text: "Best rooftop hotel in Hisar. Great hospitality and location.",
-    author: "Priya S."
-  },
-  {
-    text: "Affordable luxury with excellent services. Will visit again!",
-    author: "Anil M."
-  },
-  {
-    text: "The rooftop dining was an unforgettable experience. Highly recommended.",
-    author: "Sunita R."
-  }
-];
+interface Testimonial { text: string; author: string; }
 
 export default function Testimonials() {
+  const c = useSection('testimonials');
+  const testimonials = ((c.items as Testimonial[]) || []).length
+    ? (c.items as Testimonial[])
+    : [{ text: '', author: '' }];
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -30,6 +18,8 @@ export default function Testimonials() {
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  const active = testimonials[currentIndex % testimonials.length];
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -47,10 +37,10 @@ export default function Testimonials() {
         <div className="lg:col-span-4 flex flex-col justify-center">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 bg-gold-500"></div>
-            <span className="uppercase tracking-widest text-gold-500 text-sm font-medium">Testimonials</span>
+            <span className="uppercase tracking-widest text-gold-500 text-sm font-medium">{c.eyebrow as string}</span>
           </div>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-10">
-            Guest Experiences
+            {c.heading as string}
           </h2>
           
           <div className="bg-white p-8 border-[3px] border-gray-100 rounded-3xl text-center flex flex-col items-center">
@@ -61,7 +51,7 @@ export default function Testimonials() {
                 <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
               </svg>
-              <div className="font-serif text-5xl text-gray-900 font-bold">4.9</div>
+              <div className="font-serif text-5xl text-gray-900 font-bold">{c.ratingValue as string}</div>
             </div>
             <div className="flex gap-1 mb-4 text-gold-500">
               {[...Array(5)].map((_, i) => (
@@ -69,7 +59,7 @@ export default function Testimonials() {
               ))}
             </div>
             <div className="text-xs uppercase tracking-widest text-gray-400 font-medium">
-              Based on 241+ Reviews
+              {c.reviewsText as string}
             </div>
           </div>
         </div>
@@ -102,13 +92,13 @@ export default function Testimonials() {
               </div>
               
               <p className="text-gray-700 font-serif italic text-xl md:text-2xl leading-relaxed mb-10 relative z-10 min-h-[80px]">
-                "{testimonials[currentIndex].text}"
+                "{active.text}"
               </p>
               
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-4">
                   <div className="h-[2px] w-6 bg-gold-500"></div>
-                  <span className="font-semibold text-gray-900 text-lg">{testimonials[currentIndex].author}</span>
+                  <span className="font-semibold text-gray-900 text-lg">{active.author}</span>
                 </div>
                 
                 <div className="flex gap-2">

@@ -22,6 +22,13 @@ type Config struct {
 
 	AdminEmail    string
 	AdminPassword string
+
+	// MinIO / S3-compatible object storage for uploaded media.
+	MinioEndpoint  string // host:port, no scheme (e.g. minio.railway.internal:9000)
+	MinioAccessKey string
+	MinioSecretKey string
+	MinioBucket    string
+	MinioUseSSL    bool
 }
 
 var AppConfig *Config
@@ -52,6 +59,15 @@ func LoadConfig() {
 
 		AdminEmail:    os.Getenv("ADMIN_EMAIL"),
 		AdminPassword: os.Getenv("ADMIN_PASSWORD"),
+
+		MinioEndpoint:  os.Getenv("MINIO_ENDPOINT"),
+		MinioAccessKey: os.Getenv("MINIO_ACCESS_KEY"),
+		MinioSecretKey: os.Getenv("MINIO_SECRET_KEY"),
+		MinioBucket:    os.Getenv("MINIO_BUCKET"),
+		MinioUseSSL:    os.Getenv("MINIO_USE_SSL") == "true",
+	}
+	if AppConfig.MinioBucket == "" {
+		AppConfig.MinioBucket = "media"
 	}
 	if AppConfig.JWTSecret == "" {
 		AppConfig.JWTSecret = "your-very-secret-key"

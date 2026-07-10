@@ -33,8 +33,15 @@ export default function Navbar() {
     <nav className={`fixed top-0 left-0 w-full z-50 px-6 md:px-12 flex justify-between items-center transition-all duration-300 ${
       solid ? 'bg-white text-gray-900 shadow-md py-4' : 'bg-transparent text-white py-6'
     }`}>
-      <Link to="/" className="font-serif text-2xl font-bold tracking-wider">
-        The Royal Jewel
+      <Link to="/" className="flex items-center gap-3">
+        <img
+          src="https://res.cloudinary.com/dm3scoj2q/image/upload/v1783511410/ChatGPT_Image_Jul_8_2026_04_56_54_PM_fpbf68.png"
+          alt="The Royal Jewel"
+          className="h-11 w-11 md:h-12 md:w-12 object-contain shrink-0"
+        />
+        <span className="font-serif text-xl md:text-2xl font-bold tracking-wider">
+          The Royal Jewel
+        </span>
       </Link>
 
       <div className={`hidden md:flex space-x-8 text-sm uppercase tracking-widest font-medium ${solid ? 'text-gray-700' : 'text-white'}`}>

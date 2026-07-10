@@ -84,8 +84,17 @@ export const updateLeadStatus = (id: number, status: string) =>
 export const deleteLead = (id: number) =>
   req<void>(`/admin/leads/${id}`, { method: 'DELETE' });
 
+// --- Site content (CMS-managed sections) ---
+export const getContent = () => req<Record<string, Record<string, unknown>>>('/content');
+export const updateContentSection = (section: string, data: unknown) =>
+  req<{ section: string }>(`/admin/content/${section}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+
 // --- Image upload (multipart — bypasses the JSON req() helper) ---
-export async function uploadImage(file: File): Promise<{ id: number; url: string }> {
+// Stores the file in MinIO and returns a same-origin URL (/api/media/<key>).
+export async function uploadImage(file: File): Promise<{ key: string; url: string }> {
   const token = getToken();
   const form = new FormData();
   form.append('file', file);

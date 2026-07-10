@@ -21,8 +21,10 @@ import Cancellation from './pages/Cancellation';
 import AdminLogin from './pages/AdminLogin';
 import AdminConsole from './pages/AdminConsole';
 import AdminCMS from './pages/AdminCMS';
+import AdminContent from './pages/AdminContent';
 import AdminLeads from './pages/AdminLeads';
 import { getToken } from './lib/api';
+import { ContentProvider } from './lib/content';
 
 function RequireAuth({ children }: { children: ReactNode }) {
   return getToken() ? <>{children}</> : <Navigate to="/admin/login" replace />;
@@ -49,6 +51,7 @@ function Layout() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<RequireAuth><AdminConsole /></RequireAuth>} />
         <Route path="/admin/cms" element={<RequireAuth><AdminCMS /></RequireAuth>} />
+        <Route path="/admin/content" element={<RequireAuth><AdminContent /></RequireAuth>} />
         <Route path="/admin/leads" element={<RequireAuth><AdminLeads /></RequireAuth>} />
       </Routes>
       {!isAdmin && <Footer />}
@@ -59,7 +62,9 @@ function Layout() {
 export default function App() {
   return (
     <Router>
-      <Layout />
+      <ContentProvider>
+        <Layout />
+      </ContentProvider>
     </Router>
   );
 }

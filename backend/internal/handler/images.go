@@ -1,31 +1,47 @@
 package handler
 
 import (
+	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"imagine_backend/internal/db"
 	"imagine_backend/internal/models"
+	"imagine_backend/internal/storage"
 
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
 )
 
 const maxImageBytes = 5 << 20 // 5 MB
 
 // allowedImageTypes is a raster allow-list. SVG is intentionally excluded — it can
 // carry <script> and would execute as stored XSS when served inline from our origin.
-var allowedImageTypes = map[string]bool{
-	"image/png":  true,
-	"image/jpeg": true,
-	"image/gif":  true,
-	"image/webp": true,
+var allowedImageTypes = map[string]string{
+	"image/png":  ".png",
+	"image/jpeg": ".jpg",
+	"image/gif":  ".gif",
+	"image/webp": ".webp",
 }
 
+// mediaKeyRe constrains served object keys to what UploadImage generates:
+// 32 hex chars + a known raster extension. Prevents path traversal / arbitrary
+// object access through GET /api/media/:key.
+var mediaKeyRe = regexp.MustCompile(`^[a-f0-9]{32}\.(png|jpg|gif|webp)$`)
+
 // UploadImage handles POST /api/admin/images (multipart, field "file").
-// Stores the bytes in Postgres and returns the public URL.
+// Stores the bytes in MinIO and returns the public (same-origin) URL.
 func UploadImage(c *gin.Context) {
+	if !storage.Enabled() {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "image storage is not configured"})
+		return
+	}
+
 	// Cap the body before parsing so oversized uploads are rejected while streaming,
 	// not after buffering the whole request to memory/disk.
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxImageBytes+1024)
@@ -66,21 +82,63 @@ func UploadImage(c *gin.Context) {
 	if i := strings.IndexByte(detected, ';'); i >= 0 {
 		detected = detected[:i]
 	}
-	if !allowedImageTypes[detected] {
+	ext, ok := allowedImageTypes[detected]
+	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported image type (allowed: png, jpeg, gif, webp)"})
 		return
 	}
 
-	img := models.Image{MimeType: detected, Data: data}
-	if err := db.DB.Create(&img).Error; err != nil {
+	buf := make([]byte, 16)
+	if _, err := rand.Read(buf); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate object key"})
+		return
+	}
+	key := hex.EncodeToString(buf) + ext
+
+	_, err = storage.Client.PutObject(c.Request.Context(), storage.Bucket, key,
+		bytes.NewReader(data), int64(len(data)), minio.PutObjectOptions{ContentType: detected})
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not store image"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": img.ID, "url": "/api/images/" + strconv.FormatUint(uint64(img.ID), 10)})
+	c.JSON(http.StatusCreated, gin.H{"key": key, "url": "/api/media/" + key})
 }
 
-// GetImage handles GET /api/images/:id — public, serves the raw bytes.
+// GetMedia handles GET /api/media/:key — public, streams the object from MinIO.
+func GetMedia(c *gin.Context) {
+	if !storage.Enabled() {
+		c.Status(http.StatusServiceUnavailable)
+		return
+	}
+
+	key := c.Param("key")
+	if !mediaKeyRe.MatchString(key) {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	obj, err := storage.Client.GetObject(c.Request.Context(), storage.Bucket, key, minio.GetObjectOptions{})
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+	defer obj.Close()
+
+	// Stat resolves whether the object actually exists (GetObject is lazy).
+	info, err := obj.Stat()
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	c.Header("X-Content-Type-Options", "nosniff")
+	c.Header("Cache-Control", "public, max-age=31536000, immutable")
+	c.DataFromReader(http.StatusOK, info.Size, info.ContentType, obj, nil)
+}
+
+// GetImage handles GET /api/images/:id — legacy path for images stored in Postgres
+// before the MinIO migration. Kept so old URLs keep resolving.
 func GetImage(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -93,7 +151,6 @@ func GetImage(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 		return
 	}
-	// Stored MimeType is a server-detected raster type; nosniff is defense-in-depth.
 	c.Header("X-Content-Type-Options", "nosniff")
 	c.Header("Cache-Control", "public, max-age=31536000, immutable")
 	c.Data(http.StatusOK, img.MimeType, img.Data)

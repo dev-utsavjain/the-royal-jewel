@@ -1,16 +1,9 @@
 import { Link } from 'react-router-dom';
-
-const galleryImages = [
-  "https://res.cloudinary.com/dm3scoj2q/image/upload/v1782799643/room_xenwzf.png", // Exterior
-  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop", // Lobby
-  "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop", // Room 1
-  "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2070&auto=format&fit=crop", // Room 2
-  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop", // Dining 1
-  "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2070&auto=format&fit=crop", // Dining 2
-  "https://images.unsplash.com/photo-1590490359683-658d3d23f972?q=80&w=2074&auto=format&fit=crop", // Suite
-];
+import { useSection } from '../lib/content';
 
 export default function Gallery() {
+  const c = useSection('homeGallery');
+  const galleryImages = ((c.images as { url: string }[]) || []).map((x) => x.url);
   return (
     <section id="gallery" className="py-20 md:py-32 px-6 md:px-12 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -18,11 +11,11 @@ export default function Gallery() {
         <div className="flex flex-col items-center text-center mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 bg-gold-500"></div>
-            <span className="uppercase tracking-widest text-gold-500 text-sm font-medium">Gallery</span>
+            <span className="uppercase tracking-widest text-gold-500 text-sm font-medium">{c.eyebrow as string}</span>
             <div className="h-[1px] w-8 bg-gold-500"></div>
           </div>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-gray-900">
-            A Glimpse of Grandeur
+            {c.heading as string}
           </h2>
         </div>
 

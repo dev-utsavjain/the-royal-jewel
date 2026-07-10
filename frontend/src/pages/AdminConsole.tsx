@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BedDouble, Settings, ExternalLink, LogOut, Inbox, MailOpen } from 'lucide-react';
+import { BedDouble, Settings, ExternalLink, LogOut, Inbox, MailOpen, LayoutTemplate } from 'lucide-react';
 import { listRooms, listLeads, clearToken } from '../lib/api';
 
 export default function AdminConsole() {
@@ -66,6 +66,12 @@ export default function AdminConsole() {
             <Settings className="text-gold-500 mb-4" size={28} />
             <div className="font-serif text-xl font-bold text-gray-900 group-hover:text-gold-600">Manage Rooms</div>
             <div className="text-gray-500 text-sm mt-1">Add, edit or remove room types</div>
+          </Link>
+
+          <Link to="/admin/content" className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gold-500 transition-all group">
+            <LayoutTemplate className="text-gold-500 mb-4" size={28} />
+            <div className="font-serif text-xl font-bold text-gray-900 group-hover:text-gold-600">Site Content</div>
+            <div className="text-gray-500 text-sm mt-1">Edit images &amp; text across the site</div>
           </Link>
 
           <Link to="/admin/leads" className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gold-500 transition-all group">

@@ -4,6 +4,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { Room, listRooms } from '../lib/api';
+import { useSection } from '../lib/content';
 
 // Map CMS icon keys to lucide icons; unknown keys fall back to a check mark.
 const iconFor = (key: string) => {
@@ -51,6 +52,7 @@ function RoomGallery({ images }: { images: string[] }) {
 
 export default function RoomsPage() {
   const location = useLocation();
+  const c = useSection('roomsPage');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -86,16 +88,16 @@ export default function RoomsPage() {
       <section className="relative py-20 md:py-32 bg-black text-white px-6 md:px-12 overflow-hidden">
         <div className="absolute inset-0 opacity-40">
           <img
-            src="https://res.cloudinary.com/dm3scoj2q/image/upload/v1782799643/room_xenwzf.png"
+            src={c.heroImage as string}
             alt="Luxury Rooms"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
         <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">Our Accommodations</h1>
+          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">{c.heading as string}</h1>
           <p className="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto">
-            Experience unparalleled comfort and luxury in every stay. Discover the perfect space for your visit.
+            {c.subtitle as string}
           </p>
         </div>
       </section>

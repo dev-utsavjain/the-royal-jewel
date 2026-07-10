@@ -4,10 +4,12 @@ import type { FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { createLead } from '../lib/api';
+import { useSection } from '../lib/content';
 
 const subjects = ['Room Reservation', 'Dining & Rooftop', 'Events & Weddings', 'General Inquiry'];
 
 export default function ContactPage() {
+  const c = useSection('contactPage');
   const [params] = useSearchParams();
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -63,7 +65,7 @@ export default function ContactPage() {
       <section className="relative py-20 bg-black text-white px-6 md:px-12 overflow-hidden">
         <div className="absolute inset-0 opacity-40">
           <img
-            src="https://res.cloudinary.com/dm3scoj2q/image/upload/v1782799643/room_xenwzf.png"
+            src={c.heroImage as string}
             alt="Hotel"
             className="w-full h-full object-cover"
             loading="lazy"
@@ -72,10 +74,10 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-white">
-            Contact Us
+            {c.heroHeading as string}
           </h1>
           <p className="text-lg md:text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto">
-            We are here to assist you. Reach out to us for reservations, event inquiries, or any other questions.
+            {c.heroSubtitle as string}
           </p>
         </div>
       </section>
@@ -85,9 +87,9 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Contact Information */}
             <div>
-              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8 text-gray-900">Get in Touch</h2>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8 text-gray-900">{c.introHeading as string}</h2>
               <p className="text-gray-600 font-light text-lg mb-12">
-                Whether you're planning a stay, organizing an event, or simply have a question, our dedicated team is at your service 24/7.
+                {c.introText as string}
               </p>
 
               <div className="space-y-8">
@@ -98,9 +100,9 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-serif text-xl font-semibold mb-2">Location</h3>
                     <p className="text-gray-600 font-light leading-relaxed">
-                      Sector 13, Near Shanti Devi Hospital<br />
-                      Hisar, Haryana 125005<br />
-                      India
+                      {(c.address as string).split('\n').map((line, i, arr) => (
+                        <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+                      ))}
                     </p>
                   </div>
                 </div>
@@ -112,8 +114,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-serif text-xl font-semibold mb-2">Phone</h3>
                     <p className="text-gray-600 font-light leading-relaxed">
-                      Reservations: <a href="tel:+919930871000" className="hover:text-gold-500 transition-colors">+91 99308 71000</a><br />
-                      Front Desk: <a href="tel:+919930872000" className="hover:text-gold-500 transition-colors">+91 99308 72000</a>
+                      Reservations: <a href={`tel:${c.reservationsPhoneTel}`} className="hover:text-gold-500 transition-colors">{c.reservationsPhoneDisplay as string}</a><br />
+                      Front Desk: <a href={`tel:${c.frontDeskPhoneTel}`} className="hover:text-gold-500 transition-colors">{c.frontDeskPhoneDisplay as string}</a>
                     </p>
                   </div>
                 </div>
@@ -125,8 +127,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-serif text-xl font-semibold mb-2">Email</h3>
                     <p className="text-gray-600 font-light leading-relaxed break-all">
-                      <a href="mailto:info@hoteltheroyaljewel.com" className="hover:text-gold-500 transition-colors">info@hoteltheroyaljewel.com</a><br />
-                      <a href="mailto:events@hoteltheroyaljewel.com" className="hover:text-gold-500 transition-colors">events@hoteltheroyaljewel.com</a>
+                      <a href={`mailto:${c.emailPrimary}`} className="hover:text-gold-500 transition-colors">{c.emailPrimary as string}</a><br />
+                      <a href={`mailto:${c.emailEvents}`} className="hover:text-gold-500 transition-colors">{c.emailEvents as string}</a>
                     </p>
                   </div>
                 </div>
@@ -138,8 +140,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-serif text-xl font-semibold mb-2">Check-in / Check-out</h3>
                     <p className="text-gray-600 font-light leading-relaxed">
-                      Check-in: 2:00 PM<br />
-                      Check-out: 12:00 PM (Noon)
+                      Check-in: {c.checkIn as string}<br />
+                      Check-out: {c.checkOut as string}
                     </p>
                   </div>
                 </div>
@@ -211,7 +213,7 @@ export default function ContactPage() {
       {/* Map Section */}
       <section className="h-96 w-full relative">
         <iframe
-          src="https://maps.google.com/maps?q=Hotel%20The%20Royal%20Jewel,%20Sector%2013,%20Hisar&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          src={c.mapEmbed as string}
           className="absolute inset-0 w-full h-full border-0"
           allowFullScreen
           loading="lazy"
