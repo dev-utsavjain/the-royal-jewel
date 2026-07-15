@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"imagine_backend/config"
@@ -25,6 +26,21 @@ func main() {
 	}()
 
 	log.Printf("Connected to database: %v", db.DB.Dialector.Name())
+
+	// Multi-tenant: every project shares one physical DB, isolated by schema.
+	// Create the tenant schema and pin search_path to it BEFORE AutoMigrate so
+	// tables land in this project's schema, never public.
+	schema := config.AppConfig.DBSchema // sourced from DB_SCHEMA env var
+	if schema == "" {
+		log.Fatalf("DB_SCHEMA environment variable is required but empty — cannot run migration without a target schema")
+	}
+	if err := db.DB.Exec(fmt.Sprintf(`CREATE SCHEMA IF NOT EXISTS "%s"`, schema)).Error; err != nil {
+		log.Fatalf("failed to create schema %q: %v", schema, err)
+	}
+	if err := db.DB.Exec(fmt.Sprintf(`SET search_path TO "%s"`, schema)).Error; err != nil {
+		log.Fatalf("failed to set search_path to %q: %v", schema, err)
+	}
+	log.Printf("Running migrations in schema %q...", schema)
 
 	if err := db.DB.AutoMigrate(&models.User{}, &models.Room{}, &models.Lead{}, &models.Image{}, &models.SiteContent{}); err != nil {
 		log.Fatal(err)
